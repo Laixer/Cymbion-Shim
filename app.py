@@ -26,6 +26,8 @@ def probe(instance):
     version = request.json.get("version")
     name = request.json.get("name")
     location = request.json.get("location")
+    uptime = request.json.get("uptime")
+    memory = request.json.get("memory")
 
     if status is None or version is None:
         return (
@@ -40,21 +42,20 @@ def probe(instance):
     if name:
         log_str += f" name: {name}"
 
-    if location and len(location) == 2:
-        log_str += f" location: {location}"
-
     conn = get_db_connection()
     cur = conn.cursor()
+
+    latitude = 0
+    longitude = 0
+
     if location and len(location) == 2:
-        cur.execute(
-            "insert into public.probe (instance, status, version, location) values (%s, %s, %s, POINT(%s, %s))",
-            (instance, status, version, location[0], location[1]),
-        )
-    else:
-        cur.execute(
-            "insert into public.probe (instance, status, version) values (%s, %s, %s)",
-            (instance, status, version),
-        )
+        latitude = location[0]
+        longitude = location[1]
+
+    cur.execute(
+        "insert into public.probe (instance, status, version, location, uptime, memory) values (%s, %s, %s, POINT(%s, %s), %s, %s)",
+        (instance, status, version, latitude, longitude, uptime, memory),
+    )
     conn.commit()
     cur.close()
     conn.close()
