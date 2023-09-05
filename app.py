@@ -35,6 +35,7 @@ def probe(instance):
     cpu_5 = request.json.get("cpu_5")
     cpu_15 = request.json.get("cpu_15")
     uptime = request.json.get("uptime")
+    rpm = request.json.get("rpm")
 
     if status is None or version is None:
         return (
@@ -60,7 +61,7 @@ def probe(instance):
         longitude = location[1]
 
     cur.execute(
-        "insert into public.probe (instance, status, version, location, altitude, speed, satellites, memory, swap, cpu_1, cpu_5, cpu_15, uptime) values (%s, %s, %s, POINT(%s, %s), %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+        "insert into public.probe (instance, status, version, location, altitude, speed, satellites, memory, swap, cpu_1, cpu_5, cpu_15, uptime, rpm) values (%s, %s, %s, POINT(%s, %s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
         (
             instance,
             status,
@@ -76,6 +77,7 @@ def probe(instance):
             cpu_5,
             cpu_15,
             uptime,
+            rpm,
         ),
     )
     conn.commit()
